@@ -1,0 +1,92 @@
+---
+title: "RSM_L1"
+author: "Rice"
+date: "2023-08-19"
+output: html_document
+---
+This is the red book - Design and Analysis of Experiments with R
+
+https://cran.r-project.org/web/views/ExperimentalDesign.html
+
+https://tjmurphy.github.io/jabstb/
+
+
+daewr package - accompanies the book Design and Analysis of Experiments with R by Lawson (2014) and does not only provide data sets from the book but also some standalone functionality that is not available elsewhere in R, e.g. definitive screening designs.
+
+FrF2 package - exp design for industrial experiments - (Groemping 2014) is the most comprehensive R package for their creation
+
+
+rsm package - supports sequential optimization with first order and second order response surface models (central composite or Box-Behnken designs), offering optimization approaches like steepest ascent and visualization of the response function for linear model objects. Also, coding for response surface investigations is facilitated.
+
+
+DoE.wrapper package - enhances design creation from package rsm with the possibilities of automatically choosing the cube portion of central composite designs and of augmenting an existing (fractional) factorial 2-level design with a star portion.
+
+rsurface package - provides rotatable central composite designs for which the user specifies the minimum and maximum of the experimental variables instead of the corner points of the cube.
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+## libraries
+#install.packages("Vdgraph")
+
+library(daewr)
+library(rsm)
+library(Vdgraph)
+#library(FrF2)
+#library(DoE.wrapper)
+#library(rsurface)
+```
+
+```{r}
+data(package="daewr")
+```
+
+
+
+```{r}
+#library(rsm)
+rotd <- ccd(3, n0 = c(4,2), alpha = "rotatable",randomize = FALSE)
+rotd # the rsm experiment table
+# cdd function is from the rsm package
+
+"By choosing the distance from the origin to the axial points (α in coded units) equal to √4F where F is the number of points in
+the factorial portion of the design, a CCD will be rotatable."
+
+"The factor columns from the resulting design object rotd are copied into the data frame rotdm and the Vdgraph function from the R
+package Vdgraph (Lawson (2013b), Lawson (2012)) is then called to create Myers et al.’s (1992) variance dispersion graph"
+
+rotdm <- rotd[ , 3:5]
+#library(Vdgraph)
+Vdgraph(rotdm)
+
+"The variance dispersion graph plots the maximum, minimum, and average scaled variance of a predicted value (NV ar(yˆ(x))/σ2) 
+as a functionnof the distance from the origin of the design."
+
+"When the design is not rotatable,there will be three distinct lines on the graph. The closer together the lines,
+the closer the design is to being rotatable"
+
+```
+
+
+```{r}
+#library(daewr)
+data(Treb)
+#library(rsm)
+treb.quad <- rsm(y ~ SO(x1, x2, x3), data = Treb)
+par (mfrow=c(2,2))
+contour(treb.quad, ~ x1+x2+x3 )
+
+par (mfrow=c(2,2))
+persp(treb.quad, ~ x1+x2+x3, zlab="Distance",contours=list(z="bottom") )
+
+
+```
